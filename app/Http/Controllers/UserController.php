@@ -20,6 +20,7 @@ class UserController extends Controller
     public function __construct(User $user){
         $this->user = $user;
     }
+    
 
     /**
      * Show admin Login Page
@@ -30,9 +31,9 @@ class UserController extends Controller
         return view('home');        
     }
 
-
+    
     /**
-     * Loging user into the system.
+     * API Login.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response JWtoken
@@ -40,20 +41,7 @@ class UserController extends Controller
     public function login(Request $request){
         $credentials = $request->only('email', 'password');
         $user=User::where('email',$request->email) -> first();
-        if($request->type=='dashboad')
-        {
-            if (Auth::attempt($credentials)) {
-                
-                if($user->userType == 1){
-                    Auth::loginUsingId($user->id, true);
-                    return redirect('dashboard');
-                }else
-                    return redirect('/admin')->with('error','Worng Credentials');
-                
-            }else{
-                return redirect('/admin')->with('error','Acess Denide');
-            }
-        }else{
+        
         $token = null;
         try {
            if (!$token = JWTAuth::attempt($credentials)) {
@@ -66,6 +54,30 @@ class UserController extends Controller
             return response()->json(compact('token'));
         }else
             return response()->json(['acess_denide'], 422);
+    }
+
+
+     /**
+     * Amin Login into the system using form.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     */
+    public function loginUsingForm(Request $request){
+        $credentials = $request->only('email', 'password');
+        $user=User::where('email',$request->email) -> first();
+        if($request->type=='dashboad')
+        {
+            if (Auth::attempt($credentials)) {
+                
+                if($user->userType == 1){
+                    Auth::loginUsingId($user->id, true);
+                    return redirect('dashboard');
+                }else
+                    return redirect('/admin')->with('error','Acess Denide');
+                
+            }else{
+                return redirect('/admin')->with('error','Worng Credentials');
+            }
         }
     }
 
@@ -90,6 +102,7 @@ class UserController extends Controller
      */
     public function logout(Request $request){
         Auth::logout();
-        return redirect('/admin');
+        return redirect('/admin')->with('success','Logout successfully');
     }
+
 }

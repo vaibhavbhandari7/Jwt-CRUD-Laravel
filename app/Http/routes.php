@@ -31,9 +31,10 @@ Route::group(['middleware' => 'jwt.auth'], function () {
 */
 
 Route::group(['middleware' => ['web']], function () {
+    Route::post('/adminLogin', 'UserController@loginUsingForm');
     Route::resource('/dashboard', 'CURDController');
     Route::auth();
-    Route::get('/admin', 'UserController@index');
+    Route::get('/admin', 'UserController@index')->name('admin');
     Route::get('/logout', 'UserController@logout');
     
 });

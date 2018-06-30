@@ -9,9 +9,13 @@
 </head>
 
 <body>
+@if ($user = Auth::user())
+@if (Auth::user()->userType == 1) 
 <nav class="navbar navbar-default navbar-static-top">
         <div class="container">
+        
             <div class="navbar-header">
+
 
                 <!-- Collapsed Hamburger -->
                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#app-navbar-collapse">
@@ -30,12 +34,17 @@
             <div class="collapse navbar-collapse" id="app-navbar-collapse">
 
                 <!-- Right Side Of Navbar -->
-                <ul class="nav navbar-nav navbar-right">        
-                <li><a href="{{ url('/logout') }}"><i class="fa fa-btn fa-sign-out"></i>Logout</a></li>
-                </ul>
+                
+                    <ul class="nav navbar-nav navbar-right">        
+                        <li><a href="{{ url('/logout') }}"><i class="fa fa-btn fa-sign-out"></i>Logout</a></li>
+                    </ul>
+               
+                
             </div>
         </div>
     </nav> 
+    @endif
+    @endif
 <div class="container">
     @yield('content')
 </div>

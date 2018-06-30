@@ -10,6 +10,18 @@ use Illuminate\Support\Facades\Auth;
 
 class CURDController extends Controller
 {
+
+
+    /**
+     * Middleware to check the user is admin or not.
+     *
+     */
+    public function __construct()
+    {
+        $this->middleware('guest');
+    }
+
+
     /**
      * Display a listing of the Users.
      *
@@ -18,8 +30,7 @@ class CURDController extends Controller
      */
     public function index(Request $request)
     {
-        $this->checkAdmin();
-        $users= User::orderBy('id','DESC')->paginate(5);
+        $users= User::where("userType",'<>', 1)->orderBy('id','DESC')->paginate(5);
         return view('dashboard.index',compact('users'))
             ->with('i', ($request->input('page', 1) - 1) * 5);
             
@@ -33,7 +44,6 @@ class CURDController extends Controller
      */
     public function create()
     {
-        $this->checkAdmin();
         return view('dashboard.create');
     }
 
@@ -46,7 +56,6 @@ class CURDController extends Controller
      */
     public function store(Request $request)
     {
-        $this->checkAdmin();
         $this->validate($request, [
             'name' => 'required|max:255',
             'email' => 'required|email|max:255|unique:users',
@@ -66,7 +75,6 @@ class CURDController extends Controller
      */
     public function show($id)
     {
-        $this->checkAdmin();
         $user= User::find($id);
         return view('dashboard.show',compact('user'));
     }
@@ -80,7 +88,6 @@ class CURDController extends Controller
      */
     public function edit($id)
     {
-        $this->checkAdmin();
         $user= User::find($id);
         unset($user["password"]);
         return view('dashboard.edit',compact('user'));
@@ -96,7 +103,6 @@ class CURDController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $this->checkAdmin();
         $this->validate($request, [
             'name' => 'required|max:255',
             'password' => 'required|min:6',
@@ -118,7 +124,6 @@ class CURDController extends Controller
      */
     public function destroy($id)
     {
-        $this->checkAdmin();
         User::find($id)->delete();
         return redirect()->route('dashboard.index')
                         ->with('success','Product deleted successfully');
@@ -140,18 +145,4 @@ class CURDController extends Controller
             'password' => bcrypt($data['password']),
         ]);
     }
-
-
-    /**
-     * Validate the user for admin
-     *
-     */
-
-    protected function checkAdmin()
-    {
-        if(Auth::check())
-            if (Auth::user()->userType != 1) 
-                return redirect()->to('/admin')->with('error','Denied Access');
-    }
-
 }
